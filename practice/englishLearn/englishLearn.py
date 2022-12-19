@@ -1,5 +1,5 @@
 import pymorphy2
-from translate import Translator #особое внимание этим библиотекам)
+from translate import Translator
 import csv
 
 def getWordsNormalized(filename = "input.txt"):
@@ -9,30 +9,27 @@ def getWordsNormalized(filename = "input.txt"):
         words += line.replace('\n', '')
     words = words.replace(' ', '')
     wordsNormalized = []
-    morph = pymorphy2.MorphAnalyzer(lang="ru") #инициализируем полиморфный анализатор который приводит слова к нормальной форме
+    morph = pymorphy2.MorphAnalyzer(lang="ru")
     for element in words:
-        wordsNormalized.append(morph.parse(element)[0].normal_form) #приводим все слова к нормальной форме
+        wordsNormalized.append(morph.parse(element)[0].normal_form)
     wordsStat = {}
     for element in wordsNormalized:
         if element in wordsStat:
             wordsStat[element] += 1
         else:
             wordsStat[element] = 1
-    return dict(sorted(wordsStat.items(), key=lambda item: -item[1])) #сортируем словарь конечных данных
-
-def translateWords():
-    translator = Translator(from_lang='ru', to_lang='en', provider='mymemory')#инициализируем класс переводчика
-    words = getWordsNormalized()
+    words = dict(sorted(wordsStat.items(), key=lambda item: -item[1]))
+    translator = Translator(from_lang='ru', to_lang='en', provider='mymemory')
     data = []
     for word in words.keys():
-        data.append([translator.translate(word),word,words[word]]) #переводим каждое слово
-    with open('output.csv', 'w', encoding="utf-8") as csvfile: #записываем в csv файл
+        data.append([translator.translate(word),word,words[word]])
+    with open('output.csv', 'w', encoding="utf-8") as csvfile:
         writer = csv.writer(csvfile, delimiter='|',
                                 quotechar='|', quoting=csv.QUOTE_MINIMAL)
-        writer.writerow(['перевод|слово|количество упомнинаний'])
+        writer.writerow(['перевод|слово|количество'])
         for element in data:
             writer.writerow(element)
     return data
 
-print(translateWords())
+print(getWordsNormalized())
 
